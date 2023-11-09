@@ -16,3 +16,6 @@ library(tidyverse)
 # import forest inventory and OS data 
 forest.shp <- st_read("data/NATIONAL_FOREST_INVENTORY_WOODLAND_SCOTLAND_2017/NATIONAL_FOREST_INVENTORY_WOODLAND_SCOTLAND_2017.shp")
 OSGBgrid.shp <- st_read("data/OSGB_Grids-master/Shapefile/OSGB_Grid_10km.shp")
+
+# Intersecting files
+forestintersectOSGB <- st_intersection(forest.shp, OSGBgrid.shp)
