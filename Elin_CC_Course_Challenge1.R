@@ -19,3 +19,20 @@ OSGBgrid.shp <- st_read("data/OSGB_Grids-master/Shapefile/OSGB_Grid_10km.shp")
 
 # Intersecting files
 forestintersectOSGB <- st_intersection(forest.shp, OSGBgrid.shp)
+# checking results
+# print(forestintersectOSGB)
+
+################################################################################
+# troubleshooting discrepancies in provided data set and created one
+# drop geometry to simplify
+forestOSGB <- st_drop_geometry(forestintersectOSGB)
+
+forestOSGB <- aggregate(forestOSGB$Shape_Area, by = list(forestOSGB$TILE_NAME), FUN = sum)
+################################################################################
+# checking results compared to provided dataset
+# import provided datset
+forestCC <- read.csv("data/forestcoverOS.csv")
+
+# comparing column values
+which(as.numeric(forestCC$total.area) == as.numeric(forestOSGB$x))
+
