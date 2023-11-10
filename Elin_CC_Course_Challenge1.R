@@ -14,25 +14,31 @@ library(tidyverse)
 
 # Attempt to recreate forestcoverOS.csv
 # import forest inventory and OS data 
-forest.shp <- st_read("data/NATIONAL_FOREST_INVENTORY_WOODLAND_SCOTLAND_2017/NATIONAL_FOREST_INVENTORY_WOODLAND_SCOTLAND_2017.shp")
-OSGBgrid.shp <- st_read("data/OSGB_Grids-master/Shapefile/OSGB_Grid_10km.shp")
+forest_shp <- st_read("data/NATIONAL_FOREST_INVENTORY_WOODLAND_SCOTLAND_2017/NATIONAL_FOREST_INVENTORY_WOODLAND_SCOTLAND_2017.shp")
+OSGBgrid_shp <- st_read("data/OSGB_Grids-master/Shapefile/OSGB_Grid_10km.shp")
 
 # Intersecting files
-forestintersectOSGB <- st_intersection(forest.shp, OSGBgrid.shp)
+forestintersectOSGB <- st_intersection(forest_shp, OSGBgrid_shp)
 # checking results
 # print(forestintersectOSGB)
 
 ################################################################################
 # troubleshooting discrepancies in provided data set and created one
-# drop geometry to simplify
-forestOSGB <- st_drop_geometry(forestintersectOSGB)
-
-forestOSGB <- aggregate(forestOSGB$Shape_Area, by = list(forestOSGB$TILE_NAME), FUN = sum)
+forest_area <- aggregate(st_area(forestintersectOSGB),
+                         by = list(forestintersectOSGB$TILE_NAME),
+                         sum)
+colnames(forest_area) <- c("TILE_NAME", "Total_Area_m^2")
+forest_area$`Total_Area_m^2` <- as.numeric(forest_area$`Total_Area_m^2`)
+unique(forest_area$TILE_NAME)
 ################################################################################
 # checking results compared to provided dataset
 # import provided datset
 forestCC <- read.csv("data/forestcoverOS.csv")
 
 # comparing column values
-which(as.numeric(forestCC$total.area) == as.numeric(forestOSGB$x))
-
+which(!as.numeric(forestCC$total.area) == as.numeric(forest_area$`Total_Area_m^2`))
+merger <- merge(forest_area, forestCC, by = "TILE_NAME")
+merger$compare <-  mapply(function(x, y) {isTRUE(all.equal(x, y))}, merger$`Total_Area_m^2`, merger$total.area)
+# returns many unequal results
+merger$compare2 <- near(merger$`Total_Area_m^2`, merger$total.area)
+################################################################################
