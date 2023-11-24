@@ -17,17 +17,43 @@ library(tidyverse)
 forest_shp <- st_read("data/NATIONAL_FOREST_INVENTORY_WOODLAND_SCOTLAND_2017/NATIONAL_FOREST_INVENTORY_WOODLAND_SCOTLAND_2017.shp")
 OSGBgrid_shp <- st_read("data/OSGB_Grids-master/Shapefile/OSGB_Grid_10km.shp")
 
-# # Checking data for discrepancies
-# class(forest_shp)
-# str(forest_shp)
-# st_crs(forest_shp)               # data use same coordinate reference system (crs)
-# unique(duplicated(forest_shp))     # no duplicated values
-# anyNA(forest_shp)                  # no NA values
+# Checking data for discrepancies
+class(forest_shp)
+str(forest_shp)
+st_crs(forest_shp)               # data use same coordinate reference system (crs)
+unique(duplicated(forest_shp))     # no duplicated values
+anyNA(forest_shp)                  # no NA values
 
-# # validating geometries
-# unique(st_is_valid(forest_shp))               # some invalid geometries
+# Validating geometries
+unique(st_is_valid(forest_shp))               # some invalid geometries
 
-# repairing geometries
+# Repairing geometries
 forest_shp <- st_make_valid(forest_shp)
 
+# Importing provided dataset for comparison
+forestcoverOS <- read_csv("data/forestcoverOS.csv")
 
+# Creating data set for comparison with provided data
+# intersecting files
+forestcovertile <- st_intersection(forest_shp, OSGBgrid_shp)
+
+# Plotting data
+# plot(forest_shp, col = "lightblue", main = "Intersection")   # R got hung up and was terminated
+# plot(OSGBgrid_shp, col = "lightgreen", add = TRUE)
+# plot(forestcovertile, col = "red", add = TRUE)
+
+# duplicated tile names
+tileduplicates <- filter(forestcovertile, duplicated(forestcovertile$TILE_NAME))
+# note: some entries are true for England and Scotland
+
+# extracting Scotland only tiles
+scotsforesttile <- filter(forestcovertile, SCOTLAND == "t")
+# checking data
+ unique(scotsforesttile$ENGLAND)
+# Note: some tiles are true for more than Scotland
+ 
+# Calculate cover area
+# Country effects
+ 
+# Geometry effects
+ 
