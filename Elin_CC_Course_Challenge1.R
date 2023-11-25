@@ -48,12 +48,12 @@ tileduplicates <- filter(forestcovertile, duplicated(forestcovertile$TILE_NAME))
 
 # extracting Scotland only tiles
 scotsforesttile <- filter(forestcovertile, SCOTLAND == "t")
+
 # checking data
- unique(scotsforesttile$ENGLAND)
+unique(scotsforesttile$ENGLAND)
 # Note: some tiles are true for more than Scotland
- 
+
+# Remove 
 # Calculate cover area
 # Country effects
- 
 # Geometry effects
- 
